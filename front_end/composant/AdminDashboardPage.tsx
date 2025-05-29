@@ -10,7 +10,7 @@ import TopBar from './TopBare';
 
 const GrapheSexe = dynamic(() => import('./GrapheSexe'), { ssr: false });
 
-const statuts = ['vendu', 'mort', 'appatu', 'achete', 'nee'];
+const statuts = ['vendu', 'mort', 'abattu', 'nee'];
 
 export default function AdminDashboardPage() {
   const [totalAnimaux, setTotalAnimaux] = useState(0);
@@ -42,6 +42,7 @@ export default function AdminDashboardPage() {
     if (!Array.isArray(statutValue)) return 0;
     return statutValue.find((s: any) => s.statutTitre === titre)?.count || 0;
   };
+   const nee = totalAnimaux-(getStatutCount('abattu')+getStatutCount('vendu')+getStatutCount('mort'));
 
   return (
     <main className=" space-y-8  ">
@@ -52,8 +53,8 @@ export default function AdminDashboardPage() {
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
         <CardStat title="Total Animaux" value={totalAnimaux} icon={<GiCow size={24} />} />
         <CardStat title="Total Employés" value={totalEmployes} icon={<Users size={24} />} />
-        <CardStat title="Naissances" value={getStatutCount('nee')} icon="🐄" />
-        <CardStat title="Acheté" value={getStatutCount('achete')} icon={<ShoppingCart size={24} />} bg="bg-yellow-50" />
+        <CardStat title="Naissances" value={nee} icon="🐄" />
+        <CardStat title="Vendu" value={getStatutCount('vendu')} icon={<ShoppingCart size={24} />} bg="bg-yellow-50" />
       </div>
 
       {/* Graphiques mensuels */}

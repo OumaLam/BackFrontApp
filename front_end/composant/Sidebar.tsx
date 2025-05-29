@@ -55,7 +55,7 @@ export default function DashboardLayout({ children, menuItems }) {
         <div className="space-y-6">
           <button
             onClick={() => setShowLogoutModal(true)}
-            className="flex items-center px-10 py-2 rounded-xl hover:bg-green-50 hover:text-[#2d775c] transition"
+            className="flex w-62  items-center px-10 py-2 rounded-xl hover:bg-green-50 hover:text-[#2d775c] transition"
           >
             <FaSignOutAlt className="text-lg mr-3" />
             <span className="text-sm font-medium">Quitter</span>

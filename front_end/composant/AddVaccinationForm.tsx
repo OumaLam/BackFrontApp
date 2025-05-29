@@ -10,6 +10,7 @@ import {
   FaPlus,
 } from "react-icons/fa";
 import { MdChildCare } from "react-icons/md";
+import { PlusCircle } from "lucide-react";
 
 const InputWrapper = ({ icon, children }) => (
   <div className="relative">
@@ -20,7 +21,7 @@ const InputWrapper = ({ icon, children }) => (
   </div>
 );
 
-const VaccinationForm = () => {
+const VaccinationForm = ({ onSuccess }) => {
   const [formData, setFormData] = useState({
     vaccinNom: "",
     cibleAgeJour: "",
@@ -37,18 +38,17 @@ const VaccinationForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Combinaison des valeurs d'âge dans un seul champ
     const cibleAge = `${formData.cibleAgeAnnee}_${formData.cibleAgeMois}_${formData.cibleAgeJour}`;
 
     const dto = {
       vaccinNom: formData.vaccinNom,
-      cibleAge: cibleAge, // Envoi de l'âge sous la forme "année_mois_jour"
+      cibleAge,
       cibleSexe: formData.cibleSexe,
       remarqueVaccination: formData.remarqueVaccination,
     };
 
     try {
-      await axios.post("http://localhost:8080/api/vaccinations/new", dto,{ withCredentials: true });
+      await axios.post("http://localhost:8080/api/vaccinations/new", dto, { withCredentials: true });
       toast.success("✅ Vaccination ajoutée avec succès !");
       setFormData({
         vaccinNom: "",
@@ -58,6 +58,10 @@ const VaccinationForm = () => {
         cibleSexe: "Tous",
         remarqueVaccination: "",
       });
+
+      if (onSuccess) {
+        onSuccess();
+      }
     } catch (error) {
       toast.error("❌ Une erreur est survenue !");
       console.error("Erreur:", error);
@@ -69,123 +73,102 @@ const VaccinationForm = () => {
       <Toaster />
       <motion.form
         onSubmit={handleSubmit}
-        initial={{ opacity: 0, y: 30 }}
+        initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-        className="max-w-2xl mx-auto p-8 bg-white rounded-xl shadow space-y-8 my-10 ml-80"
+        transition={{ duration: 0.4 }}
+        className="max-w-md mx-auto  p-6 rounded-lg space-y-4 "
       >
-        <h3 className="flex justify-center items-center gap-2 text-2xl font-bold text-[#2d775c] mb-6">
-          <FaSyringe />
-          Ajouter une Vaccination
+        <h3 className="flex items-center justify-center gap-2 text-xl font-semibold text-green-700">
+          <FaSyringe className="text-green-600" />
+          Ajouter une vaccination
         </h3>
 
-        {/* Ligne 1 : Nom du vaccin & Sexe cible */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Nom du vaccin */}
-          <div>
-            <label htmlFor="vaccinNom" className="block text-sm font-medium mb-1">
-              Nom du vaccin
-            </label>
-            <InputWrapper icon={<FaSyringe />}>
-              <input
-                id="vaccinNom"
-                name="vaccinNom"
-                type="text"
-                value={formData.vaccinNom}
-                onChange={handleChange}
-                required
-                className="pl-10 pr-4 py-3 w-full border rounded-lg"
-              />
-            </InputWrapper>
-          </div>
+        <div>
+          <label htmlFor="vaccinNom" className="block text-sm font-medium text-gray-700 mb-1">
+            Nom du vaccin
+          </label>
+          <InputWrapper icon={<FaSyringe />}>
+            <input
+              id="vaccinNom"
+              name="vaccinNom"
+              type="text"
+              value={formData.vaccinNom}
+              onChange={handleChange}
+              required
+              placeholder="Ex: Vaccin antirabique"
+              className="pl-9 pr-3 py-2 w-full border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+            />
+          </InputWrapper>
+        </div>
 
-          {/* Sexe cible */}
-          <div>
-            <label htmlFor="cibleSexe" className="block text-sm font-medium mb-1">
-              Sexe cible
-            </label>
-            <InputWrapper icon={<FaVenusMars />}>
-              <select
-                id="cibleSexe"
-                name="cibleSexe"
-                value={formData.cibleSexe}
-                onChange={handleChange}
-                required
-                className="pl-10 pr-4 py-3 w-full border rounded-lg"
-              >
-                <option value="Tous">Tous</option>
-                <option value="Mâle">Mâle</option>
-                <option value="Femelle">Femelle</option>
-              </select>
-            </InputWrapper>
+        <div>
+          <label htmlFor="cibleSexe" className="block text-sm font-medium text-gray-700 mb-1">
+            Sexe cible
+          </label>
+          <InputWrapper icon={<FaVenusMars />}>
+            <select
+              id="cibleSexe"
+              name="cibleSexe"
+              value={formData.cibleSexe}
+              onChange={handleChange}
+              required
+              className="pl-9 pr-3 py-2 w-full border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+            >
+              <option value="Tous">Tous</option>
+                <option value="male">Mâle</option>
+                <option value="femelle">Femelle</option>
+            </select>
+          </InputWrapper>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Âge cible</label>
+          <div className="flex gap-3">
+            {["cibleAgeAnnee", "cibleAgeMois", "cibleAgeJour"].map((field, i) => (
+              <InputWrapper key={field} icon={<MdChildCare />}>
+                <input
+                  type="number"
+                  name={field}
+                  value={formData[field]}
+                  onChange={handleChange}
+                  required
+                  placeholder={["Année", "Mois", "Jour"][i]}
+                  min="0"
+                  className="pl-9 pr-3 py-2 w-full border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                />
+              </InputWrapper>
+            ))}
           </div>
         </div>
 
-        {/* Ligne 2 : Âge cible valeur + unité */}
         <div>
-          <label className="block text-sm font-medium mb-1">Âge cible</label>
-          <div className="flex gap-2">
-            <InputWrapper icon={<MdChildCare />}>
-              <input
-                type="number"
-                name="cibleAgeAnnee"
-                value={formData.cibleAgeAnnee}
-                onChange={handleChange}
-                required
-                placeholder="année"
-                className="pl-10 pr-4 py-3 w-full border rounded-lg"
-              />
-            </InputWrapper>
-            <InputWrapper icon={<MdChildCare />}>
-              <input
-                type="number"
-                name="cibleAgeMois"
-                value={formData.cibleAgeMois}
-                onChange={handleChange}
-                required
-                placeholder="mois"
-                className="pl-10 pr-4 py-3 w-full border rounded-lg"
-              />
-            </InputWrapper>
-            <InputWrapper icon={<MdChildCare />}>
-              <input
-                type="number"
-                name="cibleAgeJour"
-                value={formData.cibleAgeJour}
-                onChange={handleChange}
-                required
-                placeholder="jour"
-                className="pl-10 pr-4 py-3 w-full border rounded-lg"
-              />
-            </InputWrapper>
-          </div>
-        </div>
-
-        {/* Ligne 3 : Remarques */}
-        <div>
-          <label htmlFor="remarqueVaccination" className="block text-sm font-medium mb-1">
+          <label htmlFor="remarqueVaccination" className="block text-sm font-medium text-gray-700 mb-1">
             Remarques
           </label>
           <InputWrapper icon={<FaStickyNote />}>
-            <textarea required
+            <textarea
               id="remarqueVaccination"
               name="remarqueVaccination"
               value={formData.remarqueVaccination}
               onChange={handleChange}
               rows={3}
-              className="pl-10 pr-4 py-3 w-full border rounded-lg"
+              placeholder="Ajouter une remarque..."
+              className="pl-9 pr-3 py-2 w-full border border-gray-300 rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-green-500"
+              required
             />
           </InputWrapper>
         </div>
 
-        {/* Bouton d’envoi */}
         <button
           type="submit"
-          className="w-1/2 mx-auto bg-[#2d775c] text-white py-3 rounded-lg font-semibold border-2 border-green-700 hover:bg-green-700 hover:border-green-800 transition-all duration-300 transform hover:scale-105 flex items-center justify-center space-x-2 cursor-pointer"
+        className="w-full pl-34 flex items-center  "
         >
-          <FaPlus />
-          <span>Ajouter</span>
+          <div className="w-[120] cursor-pointer flex items-center justify-center bg-[#2d775c] text-center hover:bg-green-700 text-white px-4 py-2 rounded-xl shadow transition">
+                    <PlusCircle size={20} /> Ajouter
+           
+          </div>
         </button>
+        
       </motion.form>
     </>
   );

@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import axios from 'axios';
 import Cookies from 'js-cookie';
 import { v4 as uuidv4 } from 'uuid';
+import { toast, ToastContainer } from "react-toastify";
 
 export default function LoginPage() {
   const [step, setStep] = useState("login"); // login | otp | forgotPassword | newPassword
@@ -104,34 +105,38 @@ export default function LoginPage() {
     }
   };
 
-  const handleResetPassword = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    try {
-          const password = newPassword;
-                const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
-      
-                if (!passwordRegex.test(password)) {
-                  toast.error(
-                    "Le mot de passe doit contenir au moins 8 caractères, une majuscule, une minuscule, un chiffre et un caractère spécial."
-                  );
-                  return; // Stop l'envoi si la validation échoue
-                }
-      await axios.post("http://localhost:8080/api/auth/nouveau-mot-de-passe", {
-        email,
-        otp: resetOtp,
-        newPassword
-      });
-      setMessage("✅ Mot de passe réinitialisé avec succès.");
-      setStep("login");
-      CreateDeviceId();
-      
-    } catch (err) {
-      setMessage("❌ " + (err.response?.data || "Erreur serveur"));
-    } finally {
-      setLoading(false);
-    }
-  };
+ const handleResetPassword = async (e) => {
+  e.preventDefault();
+  setLoading(true);
+
+  const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
+
+  if (!passwordRegex.test(newPassword)) {
+    toast.error("Le mot de passe doit contenir au moins 8 caractères, une majuscule, une minuscule, un chiffre et un caractère spécial.");
+    setLoading(false);
+    return;
+  }
+
+  try {
+    await axios.post("http://localhost:8080/api/auth/nouveau-mot-de-passe", {
+      email,
+      otp: resetOtp,
+      newPassword
+    });
+
+    toast.success("Mot de passe réinitialisé avec succès.");
+    setMessage("✅ Mot de passe réinitialisé avec succès.");
+    setStep("login");
+    CreateDeviceId();
+
+  } catch (err) {
+    const message = err.response?.data?.message || err.response?.data || "Erreur serveur";
+    toast.error("" + message);
+    setMessage("❌ " + message);
+  } finally {
+    setLoading(false);
+  }
+};
 
   useEffect(() => {
     if (timer > 0) {
@@ -159,6 +164,15 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-green-50 p-4">
+      <ToastContainer 
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        pauseOnHover
+        draggable
+      />
       <div className="bg-white shadow-2xl rounded-3xl flex flex-col md:flex-row overflow-hidden w-full max-w-5xl">
         <div className="md:w-1/2 bg-green-100 p-6 flex flex-col justify-center items-center">
           <img src="/logo-ranch.png" alt="logo" className="w-24 md:w-32 mb-4" />

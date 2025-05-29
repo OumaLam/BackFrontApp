@@ -63,17 +63,17 @@ const VaccinationConfirmation = () => {
       }
     };
 
-    const fetchVaccin = async () => {
-      try {
-        const res = await axios.get(`http://localhost:8080/api/vaccins/${vaccinId}`,{ withCredentials: true });
-        setVaccin(res.data);
-      } catch (error) {
-        toast.error("Erreur lors du chargement du vaccin.");
-      }
-    };
+    // const fetchVaccin = async () => {
+    //   try {
+    //     const res = await axios.get(`http://localhost:8080/api/vaccins/${vaccinId}`,{ withCredentials: true });
+    //     setVaccin(res.data);
+    //   } catch (error) {
+    //     toast.error("Erreur lors du chargement du vaccin.");
+    //   }
+    // };
 
     fetchAnimals();
-    fetchVaccin();
+   // fetchVaccin();
   }, [vaccinId]);
 
   const handleCheck = (idAnimal) => {

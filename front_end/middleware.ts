@@ -11,7 +11,7 @@ function decodeJwt(token: string) {
   }
 }
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const token = request.cookies.get("auth_token")?.value;
   const fonction = request.cookies.get("fonction")?.value?.toLowerCase();
   const deviceId = request.cookies.get("deviceId")?.value;
@@ -24,16 +24,29 @@ export function middleware(request: NextRequest) {
 
   // ✅ Vérifier si le token est expiré
   if (token) {
-    const decoded = decodeJwt(token);
-    const currentTime = Math.floor(Date.now() / 1000); // en secondes
-    if (!decoded || decoded.exp < currentTime) {
-      console.log("Token expiré");
+  const decoded = decodeJwt(token);
+  const currentTime = Math.floor(Date.now() / 1000);
+  if (!decoded || decoded.exp < currentTime) {
+    console.log("Token expiré, tentative de refresh");
+    // Rediriger vers une API qui gère la génération d’un nouveau token
+    const refreshResponse = await fetch(`http://localhost:8080/api/auth/refresh`, {
+      method: "POST",
+      credentials: "include",
+    });
+
+    if (refreshResponse.ok) {
+      console.log("Token rafraîchi avec succès");
+      return NextResponse.next();
+    } else {
+      console.log("Échec du rafraîchissement");
       const response = NextResponse.redirect(new URL("/login", request.url));
       response.cookies.delete("auth_token");
       response.cookies.delete("fonction");
       return response;
     }
   }
+}
+
 
   // Cas 1 : Rediriger vers /login si infos manquantes (sauf si déjà sur /login)
   if ((!token || !fonction || !deviceId) && pathname !== "/login") {
@@ -58,5 +71,8 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/dashboard", "/dashboard-admin/:path*", "/login"],
+  matcher: ["/dashboard", 
+    "/dashboard-admin/:path*", 
+    "/login", 
+    "/dashboard-veterinaire/:path*"],
 };

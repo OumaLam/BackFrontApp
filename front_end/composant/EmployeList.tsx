@@ -194,7 +194,7 @@ toast.error(error?.response?.data?.error || "Erreur lors de l'ajout !");
       {/* Modal Form */}
       {showForm && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+          className="fixed inset-0  bg-opacity-50 flex items-center justify-center z-50"
           aria-modal="true"
           role="dialog"
           aria-labelledby="form-title"

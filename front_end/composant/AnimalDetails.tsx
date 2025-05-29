@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { MdOutlinePets, MdOutlineVaccines, MdOutlineMonitorWeight, MdOutlineMedicalServices } from "react-icons/md";
 import LoadingPage from './LoadingPage';
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
@@ -48,6 +49,8 @@ const AnimalDetails = () => {
       try {
         const response = await axios.get(`http://localhost:8080/api/vaccinations/nonInjecter/${idAnimal}`,{withCredentials: true});
         setVaccinationList(response.data);
+        console.log(response);
+
       } catch (error) {
         console.error("Erreur lors de la récupération des vaccinations", error);
       }
@@ -215,19 +218,19 @@ const AnimalDetails = () => {
   );
 
   return (
-    <div className="max-w-6xl mx-auto p-8 bg-white rounded-3xl shadow-lg mt-12 mb-12">
+    <div className="max-w-6xl mx-auto p-8    mt-12 mb-12">
       <h2 className="text-4xl font-extrabold mb-8 text-center text-green-700 underline decoration-2">
         {animal.animal?.idAnimal}
       </h2>
 
       {/* Filtres */}
-      <div className="mt-10 flex flex-wrap items-center justify-between gap-4">
+      <div className="mt-10 flex flex-wrap items-center justify-between gap-4 ">
         <div className="space-x-3">
           {['poids', 'vaccination', 'controle'].map(type => (
             <button
               key={type}
               onClick={() => setFilterType(type)}
-              className={`px-4 py-2 rounded-full ${filterType === type ? 'bg-green-600 text-white' : 'bg-gray-200 text-gray-700'} transition`}
+              className={`px-4 py-2 rounded-xl cursor-pointer ${filterType === type ? 'bg-[#2d775c] text-white' : ' text-gray-700'} transition`}
             >
               {type === 'poids' ? 'Poids' : type === 'vaccination' ? 'Vaccination' : 'Contrôle Médical'}
             </button>
@@ -245,7 +248,7 @@ const AnimalDetails = () => {
       </div>
 
       {/* Tableaux */}
-      <div className="mt-8">
+      <div className="mt-8 ">
         {filterType === 'poids' && (
           <section>
             <div className="flex justify-between items-center mb-4">
@@ -267,11 +270,11 @@ const AnimalDetails = () => {
                 </DialogContent>
               </Dialog>
             </div>
-            <table className="w-full border-collapse text-left">
-              <thead className="bg-green-100">
+            <table className="w-full border-collapse text-left shadow-lg bg-white rounded-3xl p-8">
+              <thead className="bg-[#2d775c] text-white">
                 <tr><th className="p-3">Date</th><th className="p-3">Poids (kg)</th></tr>
               </thead>
-              <tbody>
+              <tbody className="p-10">
                 {paginate(filteredPoids)?.map((p, i) => (
                   <tr key={i} className="border-b hover:bg-green-50">
                     <td className="p-3">{formatDate(p.dateMesure)}</td>
@@ -314,8 +317,8 @@ const AnimalDetails = () => {
                 </DialogContent>
               </Dialog>
             </div>
-            <table className="w-full border-collapse text-left">
-              <thead className="bg-green-100">
+            <table className="w-full border-collapse text-left shadow-lg bg-white rounded-3xl p-8">
+              <thead className="bg-[#2d775c] text-white">
                 <tr><th className="p-3">Date</th><th className="p-3">Vaccin</th></tr>
               </thead>
               <tbody>
@@ -361,8 +364,8 @@ const AnimalDetails = () => {
               </Dialog>
             </div>
             
-            <table className="w-full border-collapse text-left">
-              <thead className="bg-green-100">
+            <table className="w-full border-collapse text-left shadow-lg bg-white rounded-3xl p-8">
+              <thead className="bg-[#2d775c] text-white">
                 <tr><th className="p-3">Date</th><th className="p-3">Maladie</th><th className="p-3">Traitement</th></tr>
               </thead>
               <tbody>
